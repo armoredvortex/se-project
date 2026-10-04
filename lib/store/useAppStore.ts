@@ -22,13 +22,12 @@ export interface AppStoreActions {
   writeOffBatches: (batchIds: string[]) => void;
 
   // Transactions
-  recordSale: (items: SaleInputItem[], customDate?: string) => Sale;
+  recordSale: (items: SaleInputItem[], paymentMethod?: import('../types').PaymentMethod, customDate?: string) => Sale;
   receiveSupply: (vendorId: string, items: SupplyInputItem[], customDate?: string) => Supply;
 
   // Settings & App State
   updateSettings: (updates: Partial<Settings>) => void;
-  dismissBanner: () => void;
-  resetDemoData: () => void;
+  resetData: () => void;
   setHasHydrated: (status: boolean) => void;
 }
 
@@ -44,14 +43,11 @@ export const useAppStore = create<AppStore>()(
 
       setHasHydrated: (status: boolean) => set({ hasHydrated: status }),
 
-      dismissBanner: () => set({ bannerDismissed: true }),
-
-      resetDemoData: () => {
+      resetData: () => {
         const freshSeed = generateSeedData(new Date());
         set({
           ...freshSeed,
           hasHydrated: true,
-          bannerDismissed: false,
         });
       },
 
@@ -110,9 +106,9 @@ export const useAppStore = create<AppStore>()(
         set({ batches: nextState.batches });
       },
 
-      recordSale: (items, customDate) => {
+      recordSale: (items, paymentMethod = 'cash', customDate) => {
         const state = get();
-        const { nextState, sale } = processSale(state, items, customDate);
+        const { nextState, sale } = processSale(state, items, paymentMethod, customDate);
         set({
           batches: nextState.batches,
           sales: nextState.sales,
@@ -144,7 +140,7 @@ export const useAppStore = create<AppStore>()(
       },
     }),
     {
-      name: 'msa-demo-store-v1',
+      name: 'msa-store-v1',
       storage: createJSONStorage(() => {
         if (typeof window !== 'undefined') {
           return window.localStorage;

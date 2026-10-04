@@ -120,6 +120,12 @@ export default function PrintReceiptPage() {
           <div className="text-[11px] text-slate-700 italic leading-snug">
             {numberToWordsIndian(sale.totalAmount)}
           </div>
+          <div className="flex justify-between items-center text-xs pt-1">
+            <span className="text-slate-500">Payment Mode:</span>
+            <span className="font-semibold text-slate-800 uppercase tracking-wide">
+              {sale.paymentMethod === 'upi' ? '⬡ UPI' : '⬡ Cash'}
+            </span>
+          </div>
         </div>
 
         {/* Barcode & Footer notes */}

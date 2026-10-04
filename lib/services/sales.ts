@@ -1,4 +1,4 @@
-import { Medicine, Sale, SaleItem, StockBatch, StoreState } from '../types';
+import { Medicine, PaymentMethod, Sale, SaleItem, StockBatch, StoreState } from '../types';
 import { isBatchExpired } from '../formatters';
 import { formatReceiptNo } from './codegen';
 
@@ -88,6 +88,7 @@ export function allocateMedicineStock(
 export function processSale(
   state: StoreState,
   inputItems: SaleInputItem[],
+  paymentMethod: PaymentMethod = 'cash',
   customDate?: string,
   referenceDate: Date = new Date()
 ): { nextState: StoreState; sale: Sale } {
@@ -129,6 +130,7 @@ export function processSale(
     receiptNo,
     createdAt,
     totalAmount,
+    paymentMethod,
     items: allSaleItems,
   };
 

@@ -46,7 +46,7 @@ export default function DashboardPage() {
   // 2. Low stock count via reorder report
   const reorderReport = useMemo(() => {
     return calculateReorderReport(
-      { medicines, vendors: [], batches, supplies, sales, settings, counters: { nextMedicineNo: 0, nextChequeNo: 0, nextReceiptNo: 0 }, bannerDismissed: false },
+      { medicines, vendors: [], batches, supplies, sales, settings, counters: { nextMedicineNo: 0, nextChequeNo: 0, nextReceiptNo: 0 } },
       settings.salesWindowDays,
       settings.coverMultiplier,
       today

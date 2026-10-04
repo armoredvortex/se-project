@@ -132,12 +132,12 @@ describe('sales service - FEFO allocation', () => {
         nextChequeNo: 1,
         nextReceiptNo: 1,
       },
-      bannerDismissed: false,
     };
 
     const { nextState, sale } = processSale(
       state,
       [{ medicineId: 'med-1', quantity: 5 }],
+      'cash',
       '2026-09-01T12:00:00Z',
       referenceDate
     );

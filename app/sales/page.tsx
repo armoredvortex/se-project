@@ -4,11 +4,12 @@ import React, { useMemo, useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/lib/store/useAppStore';
-import { Medicine } from '@/lib/types';
+import { Medicine, PaymentMethod } from '@/lib/types';
 import { formatINR, isBatchExpired } from '@/lib/formatters';
 import { numberToWordsIndian } from '@/lib/services/numberToWords';
 import { formatReceiptNo } from '@/lib/services/codegen';
 import { useToast } from '@/components/ui/Toast';
+import { UpiQrModal } from '@/components/ui/UpiQrModal';
 import {
   ShoppingCart,
   Trash2,
@@ -18,6 +19,8 @@ import {
   AlertCircle,
   Layers,
   Sparkles,
+  Banknote,
+  Smartphone,
 } from 'lucide-react';
 
 interface CartLine {
@@ -30,7 +33,7 @@ function SalesContent() {
   const searchParams = useSearchParams();
   const preselectedCode = searchParams.get('code');
 
-  const { medicines, batches, counters, recordSale } = useAppStore();
+  const { medicines, batches, counters, settings, recordSale } = useAppStore();
   const { success, error } = useToast();
 
   const today = useMemo(() => new Date(), []);
@@ -50,6 +53,12 @@ function SalesContent() {
   const [cart, setCart] = useState<CartLine[]>([]);
   const [selectedMedSearch, setSelectedMedSearch] = useState('');
   const [createdSaleId, setCreatedSaleId] = useState<string | null>(null);
+
+  // Payment method selection
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
+  const [upiModalOpen, setUpiModalOpen] = useState(false);
+  // Stores the pending sale receipt number shown during UPI wait
+  const [pendingReceiptNo, setPendingReceiptNo] = useState('');
 
   // If preselected code from URL, add it to cart
   useEffect(() => {
@@ -177,29 +186,29 @@ function SalesContent() {
     return formatReceiptNo(counters.nextReceiptNo);
   }, [counters.nextReceiptNo]);
 
-  const handleCheckout = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  // Shared validation before any checkout path
+  const validateCart = (): boolean => {
     if (cart.length === 0) {
       error('Please add at least one item to checkout');
-      return;
+      return false;
     }
-
-    // Check overselling
     for (const item of allocationPreview) {
       if (item.isOverselling) {
         error(`Insufficient stock for "${item.medicine?.tradeName}". Please adjust quantity.`);
-        return;
+        return false;
       }
     }
+    return true;
+  };
 
+  // Commit the sale to the store (called for both cash and UPI-confirmed)
+  const commitSale = (method: PaymentMethod) => {
     try {
       const inputItems = cart.map((c) => ({
         medicineId: c.medicineId,
         quantity: c.quantity,
       }));
-
-      const sale = recordSale(inputItems);
+      const sale = recordSale(inputItems, method);
       success(`Sale completed! Receipt ${sale.receiptNo} generated.`);
       setCreatedSaleId(sale.id);
     } catch (err: unknown) {
@@ -207,6 +216,30 @@ function SalesContent() {
       error(msg);
     }
   };
+
+  const handleCheckout = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateCart()) return;
+
+    if (paymentMethod === 'upi') {
+      // Show UPI QR modal; sale is committed only after "Mark as Paid"
+      setPendingReceiptNo(nextReceiptNumber);
+      setUpiModalOpen(true);
+    } else {
+      commitSale('cash');
+    }
+  };
+
+  const handleUpiConfirm = () => {
+    setUpiModalOpen(false);
+    commitSale('upi');
+  };
+
+  const handleUpiCancel = () => {
+    setUpiModalOpen(false);
+  };
+
+  const upiEnabled = Boolean(settings.upiVpa?.trim());
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-6">
@@ -220,6 +253,17 @@ function SalesContent() {
           Dispense retail prescriptions with automated FEFO batch allocation, oversell guards, and instant cash memo receipts.
         </p>
       </div>
+
+      {/* UPI QR Modal */}
+      <UpiQrModal
+        isOpen={upiModalOpen}
+        amount={grandTotal}
+        upiVpa={settings.upiVpa || ''}
+        shopName={settings.shopName}
+        receiptNo={pendingReceiptNo}
+        onConfirm={handleUpiConfirm}
+        onCancel={handleUpiCancel}
+      />
 
       {createdSaleId ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm text-center max-w-xl mx-auto space-y-5 animate-in fade-in zoom-in-95">
@@ -248,6 +292,16 @@ function SalesContent() {
               <span className="text-slate-500">Amount Received:</span>
               <span className="font-bold text-emerald-700">{formatINR(grandTotal)}</span>
             </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Payment Method:</span>
+              <span className={`font-semibold flex items-center gap-1 ${paymentMethod === 'upi' ? 'text-violet-700' : 'text-slate-800'}`}>
+                {paymentMethod === 'upi' ? (
+                  <><Smartphone className="w-3.5 h-3.5" /> UPI</>
+                ) : (
+                  <><Banknote className="w-3.5 h-3.5" /> Cash</>
+                )}
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -262,6 +316,7 @@ function SalesContent() {
               onClick={() => {
                 setCreatedSaleId(null);
                 setCart([]);
+                setPaymentMethod('cash');
               }}
               className="w-full sm:w-auto px-6 py-2.5 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl text-sm font-semibold"
             >
@@ -497,14 +552,66 @@ function SalesContent() {
                 </div>
               </div>
 
+              {/* Payment Method Toggle */}
+              <div className="pt-1 space-y-2">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Payment Method
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('cash')}
+                    className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+                      paymentMethod === 'cash'
+                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm'
+                        : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Banknote className="w-4 h-4" />
+                    Cash
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => upiEnabled && setPaymentMethod('upi')}
+                    title={!upiEnabled ? 'Add UPI VPA in Settings to enable' : undefined}
+                    className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+                      !upiEnabled
+                        ? 'border-slate-200 text-slate-300 cursor-not-allowed bg-slate-50'
+                        : paymentMethod === 'upi'
+                        ? 'bg-violet-600 border-violet-600 text-white shadow-sm'
+                        : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Smartphone className="w-4 h-4" />
+                    UPI
+                  </button>
+                </div>
+                {!upiEnabled && (
+                  <p className="text-[10px] text-slate-400 leading-relaxed">
+                    UPI disabled — add your VPA in{' '}
+                    <Link href="/settings" className="text-emerald-600 underline underline-offset-2">
+                      Settings
+                    </Link>
+                    .
+                  </p>
+                )}
+              </div>
+
               <button
                 type="button"
                 onClick={handleCheckout}
                 disabled={cart.length === 0}
-                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className={`w-full py-3.5 disabled:opacity-50 text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 ${
+                  paymentMethod === 'upi'
+                    ? 'bg-violet-600 hover:bg-violet-700'
+                    : 'bg-emerald-600 hover:bg-emerald-700'
+                }`}
               >
-                <Printer className="w-4 h-4" />
-                <span>Complete Sale & Issue Receipt</span>
+                {paymentMethod === 'upi' ? (
+                  <><Smartphone className="w-4 h-4" /><span>Show UPI QR & Collect</span></>
+                ) : (
+                  <><Printer className="w-4 h-4" /><span>Complete Sale & Issue Receipt</span></>
+                )}
               </button>
 
               <div className="p-3 bg-emerald-50 rounded-xl text-[11px] text-emerald-800 space-y-1">

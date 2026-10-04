@@ -32,6 +32,7 @@ describe('reorder service', () => {
         receiptNo: 'REC-001',
         createdAt: subDays(refDate, 5).toISOString(),
         totalAmount: 4800,
+        paymentMethod: 'cash',
         items: [{ medicineId: 'med-reorder', batchNo: 'B1', quantity: 40, unitPrice: 120, unitCost: 90 }],
       },
       {
@@ -39,6 +40,7 @@ describe('reorder service', () => {
         receiptNo: 'REC-002',
         createdAt: subDays(refDate, 15).toISOString(),
         totalAmount: 2400,
+        paymentMethod: 'cash',
         items: [{ medicineId: 'med-reorder', batchNo: 'B1', quantity: 20, unitPrice: 120, unitCost: 90 }],
       },
       {
@@ -46,6 +48,7 @@ describe('reorder service', () => {
         receiptNo: 'REC-003',
         createdAt: subDays(refDate, 50).toISOString(), // outside 28-day window
         totalAmount: 12000,
+        paymentMethod: 'cash',
         items: [{ medicineId: 'med-reorder', batchNo: 'B1', quantity: 100, unitPrice: 120, unitCost: 90 }],
       },
     ];
@@ -89,6 +92,7 @@ describe('reorder service', () => {
           receiptNo: 'REC-001',
           createdAt: subDays(refDate, 7).toISOString(),
           totalAmount: 7200,
+          paymentMethod: 'cash',
           items: [{ medicineId: 'med-reorder', batchNo: 'B-VAL', quantity: 60, unitPrice: 120, unitCost: 90 }],
         },
       ],
@@ -100,7 +104,6 @@ describe('reorder service', () => {
         shopPhone: '123',
       },
       counters: { nextMedicineNo: 2, nextChequeNo: 1, nextReceiptNo: 2 },
-      bannerDismissed: false,
     };
 
     // 60 units sold in 4 weeks -> weeklyAvg = 15.

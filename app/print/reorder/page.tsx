@@ -17,7 +17,7 @@ function PrintReorderContent() {
 
   const { vendorGroups } = useMemo(() => {
     return calculateReorderReport(
-      { medicines, vendors, batches, supplies, sales, settings, counters, bannerDismissed: false },
+      { medicines, vendors, batches, supplies, sales, settings, counters },
       windowDays,
       coverMultiplier,
       today

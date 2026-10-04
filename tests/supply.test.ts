@@ -56,7 +56,6 @@ describe('supply service', () => {
       nextChequeNo: 1,
       nextReceiptNo: 1,
     },
-    bannerDismissed: false,
   };
 
   it('increments existing batch quantity if batch number matches', () => {

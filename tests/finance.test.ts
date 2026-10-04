@@ -16,6 +16,7 @@ describe('finance service', () => {
       receiptNo: 'REC-001',
       createdAt: '2026-09-10T10:00:00Z',
       totalAmount: 1000,
+      paymentMethod: 'cash',
       items: [
         { medicineId: 'm-1', batchNo: 'B1', quantity: 10, unitPrice: 100, unitCost: 70 }, // Rev: 1000, Cost: 700
       ],
@@ -25,6 +26,7 @@ describe('finance service', () => {
       receiptNo: 'REC-002',
       createdAt: '2026-09-15T14:30:00Z',
       totalAmount: 500,
+      paymentMethod: 'cash',
       items: [
         { medicineId: 'm-2', batchNo: 'B2', quantity: 5, unitPrice: 100, unitCost: 60 }, // Rev: 500, Cost: 300
       ],
@@ -34,6 +36,7 @@ describe('finance service', () => {
       receiptNo: 'REC-003',
       createdAt: '2026-08-01T14:30:00Z',
       totalAmount: 200,
+      paymentMethod: 'cash',
       items: [
         { medicineId: 'm-1', batchNo: 'B1', quantity: 2, unitPrice: 100, unitCost: 70 },
       ],

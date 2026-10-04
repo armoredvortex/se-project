@@ -12,10 +12,11 @@ import {
   Sliders,
   ShieldCheck,
   AlertTriangle,
+  Smartphone,
 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { settings, medicines, batches, sales, supplies, vendors, updateSettings, resetDemoData } =
+  const { settings, medicines, batches, sales, supplies, vendors, updateSettings, resetData } =
     useAppStore();
   const { success } = useToast();
 
@@ -23,6 +24,7 @@ export default function SettingsPage() {
   const [shopAddress, setShopAddress] = useState(settings.shopAddress);
   const [shopPhone, setShopPhone] = useState(settings.shopPhone);
   const [shopGst, setShopGst] = useState(settings.shopGst || '');
+  const [upiVpa, setUpiVpa] = useState(settings.upiVpa || '');
   const [salesWindowDays, setSalesWindowDays] = useState(settings.salesWindowDays);
   const [coverMultiplier, setCoverMultiplier] = useState(settings.coverMultiplier);
 
@@ -35,6 +37,7 @@ export default function SettingsPage() {
       shopAddress: shopAddress.trim(),
       shopPhone: shopPhone.trim(),
       shopGst: shopGst.trim(),
+      upiVpa: upiVpa.trim(),
       salesWindowDays: Number(salesWindowDays),
       coverMultiplier: Number(coverMultiplier),
     });
@@ -42,18 +45,17 @@ export default function SettingsPage() {
   };
 
   const handleConfirmReset = () => {
-    resetDemoData();
-    // Resync local form fields with fresh seed
+    resetData();
     const fresh = useAppStore.getState().settings;
     setShopName(fresh.shopName);
     setShopAddress(fresh.shopAddress);
     setShopPhone(fresh.shopPhone);
     setShopGst(fresh.shopGst || '');
+    setUpiVpa(fresh.upiVpa || '');
     setSalesWindowDays(fresh.salesWindowDays);
     setCoverMultiplier(fresh.coverMultiplier);
-
     setResetModalOpen(false);
-    success('Demo database reset and reseeded with realistic Indian pharmacy data!');
+    success('Database reset and reseeded with inventory data!');
   };
 
   return (
@@ -132,6 +134,41 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* UPI Payment Settings */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-2 text-slate-800 font-bold text-base pb-3 border-b border-slate-100">
+            <Smartphone className="w-5 h-5 text-violet-600" />
+            <span>UPI Payment</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                UPI VPA (Virtual Payment Address)
+              </label>
+              <input
+                type="text"
+                value={upiVpa}
+                onChange={(e) => setUpiVpa(e.target.value)}
+                placeholder="yourshop@upi"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-violet-500 focus:outline-none font-mono"
+              />
+              <span className="text-[11px] text-slate-400 mt-1 block">
+                Your UPI ID (e.g. <span className="font-mono">shop@okaxis</span>, <span className="font-mono">9876543210@paytm</span>). Used to generate the QR code at checkout. Leave blank to disable UPI payments.
+              </span>
+            </div>
+          </div>
+
+          {upiVpa.trim() && (
+            <div className="flex items-start gap-2.5 p-3 bg-violet-50 border border-violet-200 rounded-xl text-xs text-violet-800">
+              <Smartphone className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-violet-600" />
+              <span>
+                UPI QR will be generated for <strong className="font-mono">{upiVpa.trim()}</strong> at the POS checkout. This runs in test/sandbox mode — no real transaction is processed.
+              </span>
+            </div>
+          )}
+        </div>
+
         {/* Reorder Strategy Defaults */}
         <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
           <div className="flex items-center gap-2 text-slate-800 font-bold text-base pb-3 border-b border-slate-100">
@@ -187,8 +224,8 @@ export default function SettingsPage() {
         </div>
       </form>
 
-      {/* Storage Architecture & Diagnostics */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
+      {/* Storage Status */}
+      {/* <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2 text-slate-800 font-bold text-base pb-3 border-b border-slate-100">
           <Database className="w-5 h-5 text-emerald-600" />
           <span>Browser Persistence Status</span>
@@ -220,23 +257,25 @@ export default function SettingsPage() {
         <div className="flex items-start gap-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600">
           <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
           <p>
-            All records are preserved in local browser storage via Zustand repository middleware (<code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-[11px]">/lib/store</code>). No external server database or API credentials needed.
+            All records are preserved in local browser storage via Zustand persist middleware (
+            <code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-[11px]">/lib/store</code>
+            ). No external server or API credentials required.
           </p>
         </div>
-      </div>
+      </div> */}
 
-      {/* Danger Zone: Reset Demo Data */}
-      <div className="bg-white rounded-2xl border border-rose-200 p-5 sm:p-6 shadow-sm space-y-4">
+      {/* Danger Zone */}
+      {/* <div className="bg-white rounded-2xl border border-rose-200 p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2 text-rose-800 font-bold text-base pb-3 border-b border-rose-100">
           <AlertTriangle className="w-5 h-5 text-rose-600" />
-          <span>Reset Demo Environment</span>
+          <span>Reset Data</span>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h4 className="text-sm font-semibold text-slate-900">Reset & Reseed Demo Data</h4>
+            <h4 className="text-sm font-semibold text-slate-900">Reset & Reseed Data</h4>
             <p className="text-xs text-slate-500 max-w-lg">
-              Clears current browser storage and re-generates reproducible demo inventory with 25 Indian medicines, 5 vendors, multi-batch expiry cases, and 6 weeks of sales history.
+              Clears current browser storage and re-generates inventory with 25 medicines, 5 vendors, multi-batch expiry cases, and 6 weeks of sales history.
             </p>
           </div>
 
@@ -246,16 +285,16 @@ export default function SettingsPage() {
             className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all flex-shrink-0"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Reset Demo Data</span>
+            <span>Reset Data</span>
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Confirmation Modal */}
       <Modal
         isOpen={resetModalOpen}
         onClose={() => setResetModalOpen(false)}
-        title="Reset Demo Data?"
+        title="Reset Data?"
         description="This will clear your local storage and regenerate clean seed inventory."
         maxWidth="md"
       >

@@ -28,7 +28,7 @@ export default function ReorderPage() {
   // Compute reorder suggestions grouped by vendor
   const { reorderItems, vendorGroups } = useMemo(() => {
     return calculateReorderReport(
-      { medicines, vendors, batches, supplies, sales, settings, counters, bannerDismissed: false },
+      { medicines, vendors, batches, supplies, sales, settings, counters },
       windowDays,
       coverMultiplier,
       today

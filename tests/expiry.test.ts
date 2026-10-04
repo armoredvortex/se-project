@@ -110,7 +110,6 @@ describe('expiry service', () => {
         shopPhone: '123',
       },
       counters: { nextMedicineNo: 3, nextChequeNo: 1, nextReceiptNo: 1 },
-      bannerDismissed: false,
     };
 
     const nextState = markBatchesWrittenOff(state, ['b-exp-1', 'b-exp-2']);

@@ -214,6 +214,7 @@ export function generateSeedData(baseDate: Date = new Date()): StoreState {
         receiptNo: formatReceiptNo(receiptCounter++),
         createdAt: saleDateTime.toISOString(),
         totalAmount: Number(totalAmount.toFixed(2)),
+        paymentMethod: 'cash',
         items: saleItems,
       });
     }
@@ -271,6 +272,7 @@ export function generateSeedData(baseDate: Date = new Date()): StoreState {
     shopAddress: 'Shop No. 4, Market Complex, Civil Hospital Road, Pune - 411001',
     shopPhone: '+91 98230 45678',
     shopGst: '27AABCS1429B1Z2',
+    upiVpa: 'sanjivani.medical@upi',
   };
 
   const counters: Counters = {
@@ -287,6 +289,5 @@ export function generateSeedData(baseDate: Date = new Date()): StoreState {
     sales,
     settings,
     counters,
-    bannerDismissed: false,
   };
 }

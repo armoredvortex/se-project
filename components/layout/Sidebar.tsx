@@ -89,16 +89,12 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer / Info */}
-      <div className="p-4 border-t border-slate-800 text-xs text-slate-400 flex flex-col gap-1 bg-slate-950/40">
-        <div className="flex items-center justify-between text-slate-300">
-          <span className="font-semibold text-emerald-400">Offline-First</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">Demo v1.0</span>
-        </div>
+      {/* Footer */}
+      {/* <div className="p-4 border-t border-slate-800 text-xs text-slate-400 bg-slate-950/40">
         <p className="text-[11px] text-slate-500 leading-normal">
-          Persisted in browser storage. Ready for Vercel deployment.
+          Data stored in browser storage.
         </p>
-      </div>
+      </div> */}
     </div>
   );
 

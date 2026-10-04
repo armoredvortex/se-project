@@ -50,11 +50,14 @@ export interface SaleItem {
   unitCost: number;
 }
 
+export type PaymentMethod = 'cash' | 'upi';
+
 export interface Sale {
   id: string;
   receiptNo: string;
   createdAt: string; // ISO string
   totalAmount: number;
+  paymentMethod: PaymentMethod;
   items: SaleItem[];
 }
 
@@ -65,6 +68,7 @@ export interface Settings {
   shopAddress: string;
   shopPhone: string;
   shopGst?: string;
+  upiVpa?: string; // e.g. "shop@upi" — used to generate QR
 }
 
 export interface Counters {
@@ -81,7 +85,6 @@ export interface StoreState {
   sales: Sale[];
   settings: Settings;
   counters: Counters;
-  bannerDismissed: boolean;
 }
 
 export interface ReorderItem {

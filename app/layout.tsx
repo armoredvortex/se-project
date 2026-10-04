@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { HydrationShield } from '@/components/layout/HydrationShield';
-import { DemoBanner } from '@/components/layout/Banner';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { ToastProvider } from '@/components/ui/Toast';
 
@@ -20,7 +19,6 @@ export default function RootLayout({
       <body className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased flex flex-col selection:bg-emerald-500 selection:text-white">
         <HydrationShield>
           <ToastProvider>
-            <DemoBanner />
             <div className="flex-1 flex flex-col md:flex-row min-h-0">
               <Sidebar />
               <main className="flex-1 min-w-0 overflow-y-auto">
