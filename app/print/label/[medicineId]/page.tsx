@@ -41,40 +41,42 @@ export default function PrintRackLabelPage() {
           {[...Array(6)].map((_, idx) => (
             <div
               key={idx}
-              className="p-4 bg-white border-2 border-slate-900 rounded-xl flex flex-col justify-between h-48 print:h-44 shadow-sm print:shadow-none break-inside-avoid"
+              className="p-3 bg-white border-2 border-slate-900 rounded-xl flex flex-col gap-1.5 shadow-sm print:shadow-none break-inside-avoid"
             >
               {/* Top Banner */}
               <div className="flex items-center justify-between border-b-2 border-slate-900 pb-1.5">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-600">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-600 truncate mr-2">
                   {settings.shopName.split(' ')[0]} PHARMACY
                 </span>
-                <span className="font-mono text-xs font-extrabold bg-slate-950 text-white px-2 py-0.5 rounded">
+                <span className="font-mono text-xs font-extrabold bg-slate-950 text-white px-2 py-0.5 rounded flex-shrink-0">
                   RACK {medicine.rackNo}
                 </span>
               </div>
 
               {/* Medicine details */}
-              <div className="my-1.5">
-                <h2 className="text-base font-extrabold text-slate-950 leading-tight truncate">
+              <div>
+                <h2 className="text-sm font-extrabold text-slate-950 leading-tight line-clamp-2">
                   {medicine.tradeName}
                 </h2>
-                <p className="text-[11px] text-slate-600 line-clamp-2 leading-snug mt-0.5">
+                <p className="text-[10px] text-slate-600 line-clamp-2 leading-snug mt-0.5">
                   {medicine.genericName}
                 </p>
               </div>
 
-              {/* Barcode & Price footer */}
-              <div className="pt-1.5 border-t border-slate-300 flex items-end justify-between">
+              {/* Price row */}
+              <div className="flex items-center justify-between pt-1 border-t border-slate-200">
                 <div>
                   <div className="text-[9px] uppercase font-bold text-slate-400">Retail MRP</div>
                   <div className="text-sm font-extrabold text-slate-950">
                     {formatINR(medicine.sellingPrice)}
                   </div>
                 </div>
+                <span className="font-mono text-[10px] font-bold text-slate-500">{medicine.code}</span>
+              </div>
 
-                <div className="text-right flex flex-col items-end">
-                  <Barcode value={medicine.code} height={28} showValue={true} />
-                </div>
+              {/* Barcode — full width, contained */}
+              <div className="w-full pt-1 border-t border-slate-200">
+                <Barcode value={medicine.code} height={28} showValue={false} className="w-full" />
               </div>
             </div>
           ))}

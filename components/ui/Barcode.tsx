@@ -49,10 +49,10 @@ export function Barcode({
   currentX += 10;
 
   return (
-    <div className={`inline-flex flex-col items-center select-none ${className}`}>
+    <div className={`flex flex-col items-center select-none w-full ${className}`}>
       <svg
         viewBox={`0 0 ${currentX} ${height}`}
-        className="w-full h-auto max-w-[240px]"
+        className="w-full h-auto"
         preserveAspectRatio="none"
       >
         {rects.map((r, idx) => (
