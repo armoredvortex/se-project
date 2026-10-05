@@ -272,7 +272,7 @@ export function generateSeedData(baseDate: Date = new Date()): StoreState {
     shopAddress: 'Shop No. 4, Market Complex, Civil Hospital Road, Pune - 411001',
     shopPhone: '+91 98230 45678',
     shopGst: '27AABCS1429B1Z2',
-    upiVpa: 'sanjivani.medical@upi',
+    upiVpa: 'rachitpandey-proton.me@oksbi',
   };
 
   const counters: Counters = {
