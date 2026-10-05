@@ -7,16 +7,12 @@ import { Modal } from '@/components/ui/Modal';
 import {
   Settings as SettingsIcon,
   Store,
-  RotateCcw,
-  Database,
   Sliders,
-  ShieldCheck,
-  AlertTriangle,
   Smartphone,
 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { settings, medicines, batches, sales, supplies, vendors, updateSettings, resetData } =
+  const { settings, updateSettings, resetData } =
     useAppStore();
   const { success } = useToast();
 

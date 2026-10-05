@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
-import { X, Smartphone, CheckCircle2, Clock, AlertCircle, Wifi } from 'lucide-react';
+import { X, Smartphone, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { formatINR } from '@/lib/formatters';
 
 interface UpiQrModalProps {
